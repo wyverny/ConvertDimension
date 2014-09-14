@@ -23,6 +23,7 @@ public class ConvertDimen {
 
 	static final String sw320dp = "sw320dp";
 	static final String sw360dp = "sw360dp";
+	static final String sw400dp = "sw400dp";
 	static final String sw600dp = "sw600dp";
 	static final String sw720dp = "sw720dp";
 	static final String sw800dp = "sw800dp";
@@ -30,8 +31,9 @@ public class ConvertDimen {
 	static int inputType;
 	static NodeList nodeList;
 	static String[] mDimenName;
-	static String[] types = new String[] {sw320dp, sw360dp, sw600dp, sw720dp, sw800dp};
+	static String[] types = new String[] {sw320dp, sw360dp, sw400dp, sw600dp, sw720dp, sw800dp};
 	static File xmlFile = null;
+	// C:/work_tikkle/res/values-sw360dp/dimens.xml
 	// /Users/smilee_yang/Documents/workspace/SupportDifferentSize/res/values/dimens.xml
 	
 	public static void main(String[] args) {
@@ -75,20 +77,20 @@ public class ConvertDimen {
 					}
 					if (nowDimenValue.length != 0) {
 						System.out.println("-------------------------");
-						System.out.print("This file is based on - 1.sw320dp 2.sw360dp 3.sw600dp 4.sw720dp 5.sw800dp (plz enter the number): ");
+						System.out.print("This file is based on - 1.sw320dp 2.sw360dp 3.sw400dp 4.sw600dp 5.sw720dp 6.sw800dp (plz enter the number): ");
 						String densityType = null;
 						int nowChoice = 0;
 						do {
 							densityType = readKeyIn();
-							if (densityType.equals("1") || densityType.equals("2") || densityType.equals("3") || densityType.equals("4") || densityType.equals("5")) {
+							if (densityType.matches("[1-6]")) {
 								nowChoice = Integer.valueOf(densityType);
 								System.out.println("Start convert process, convert from " + types[nowChoice-1] + " to the others.");
 								inputType = nowChoice;
 								filterUnit(nowDimenValue);
 							} else {
-								System.out.print("Please enter the number either 1 or 2 or 3 or 4 or 5 (1.sw320dp 2.sw360dp 3.sw600dp 4.sw720dp 5.sw800dp): ");
+								System.out.print("Please enter the number either 1 or 2 or 3 or 4 or 5 or 6 (1.sw320dp 2.sw360dp 3.sw400dp 4.sw600dp 5.sw720dp 6.sw800dp): ");
 							}
-						} while (!densityType.equals("1") && !densityType.equals("2") && !densityType.equals("3") && !densityType.equals("4") && !densityType.equals("5"));
+						} while (!densityType.matches("[1-6]"));
 						System.out.println("Convert process completed.");
 					} else {
 						System.out.println("Can't get dimension values, please check your dimens.xml, thanks.");
@@ -141,42 +143,41 @@ public class ConvertDimen {
 	
 	public static void writingLoop(String[] nowDimenValue, String[] onlyValue) {
 		String[][] newDimenValue = new String[onlyValue.length][onlyValue.length];
-		int formula = 4;
-		Double[] formulaForSw320dp = new Double[] { 1.125, 1.875, 2.25, 2.5 }; // sw320dp to sw360dp, sw600dp, sw720dp, sw800dp
-		Double[] formulaForSw360dp = new Double[] { 0.89, 1.67, 2.0, 2.22 }; // sw360dp to sw320dp, sw600dp, sw720dp, sw800dp
-		Double[] formulaForSw600dp = new Double[] { 0.53, 0.6, 1.2, 1.33 }; // sw600dp to sw320dp, sw360dp, sw720dp, sw800dp
-		Double[] formulaForSw720dp = new Double[] { 0.44, 0.5, 0.83, 1.11 }; // sw720dp to sw320dp, sw360dp, sw600dp, sw800dp
-		Double[] formulaForSw800dp = new Double[] { 0.4, 0.45, 0.75, 0.9 }; // sw800dp to sw320dp, sw360dp, sw600dp, sw720dp
-		BigDecimal bd;
+		int formula = 5;
+		Double[] formulaForSw320dp = new Double[] { 1.125, 1.25, 1.875, 2.25, 2.5 }; // sw320dp to sw360dp, sw400dp, sw600dp, sw720dp, sw800dp
+		Double[] formulaForSw360dp = new Double[] { 0.89, 1.11, 1.67, 2.0, 2.22 }; // sw360dp to sw320dp, sw400dp, sw600dp, sw720dp, sw800dp
+		Double[] formulaForSw400dp = new Double[] { 0.8, 0.9, 1.5, 1.8, 2.0 }; // sw400dp to sw320dp, sw360dp, sw600dp, sw720dp, sw800dp
+		Double[] formulaForSw600dp = new Double[] { 0.53, 0.6, 0.67, 1.2, 1.33 }; // sw600dp to sw320dp, sw360dp, sw400dp, sw720dp, sw800dp
+		Double[] formulaForSw720dp = new Double[] { 0.44, 0.5, 0.56, 0.83, 1.11 }; // sw720dp to sw320dp, sw360dp, sw400dp, sw600dp, sw800dp
+		Double[] formulaForSw800dp = new Double[] { 0.4, 0.45, 0.5, 0.75, 0.9 }; // sw800dp to sw320dp, sw360dp, sw400dp, sw600dp, sw720dp
+		BigDecimal bd = null;
 		for (int times = 0; times < formula; times++) {
 			for (int index = 0; index < onlyValue.length; index++) {
+				Double[] formulas = null;
 				switch (inputType) {
 				case 1:
-					bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulaForSw320dp[times]);
-					bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-					newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+					formulas = formulaForSw320dp;
 					break;
 				case 2:
-					bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulaForSw360dp[times]);
-					bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-					newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+					formulas = formulaForSw360dp;
 					break;
 				case 3:
-					bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulaForSw600dp[times]);
-					bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-					newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+					formulas = formulaForSw400dp;
 					break;
 				case 4:
-					bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulaForSw720dp[times]);
-					bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-					newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+					formulas = formulaForSw600dp;
 					break;
 				case 5:
-					bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulaForSw800dp[times]);
-					bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-					newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+					formulas = formulaForSw720dp;
+					break;
+				case 6:
+					formulas = formulaForSw800dp;
 					break;
 				}
+				bd = new BigDecimal(Float.valueOf(onlyValue[index]) * formulas[times]);
+				bd = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+				newDimenValue[times][index] = nowDimenValue[index].replace(onlyValue[index], String.valueOf(bd));
+				
 //				System.out.println("newDimenValue["+times+"]["+index+"]="+newDimenValue[times][index]);
 			}
 		}
@@ -185,7 +186,6 @@ public class ConvertDimen {
 
 	public static void bufferedFileWriter(String[][] newDimenValue) {
 		String confirmChoice = null;
-		Boolean doubleCheckSavingPath = false;
 		System.out.print("Convert success! Now saving path is: " + savingPath + "\nDo you want to save these files with this path? (Y/N) ");
 		do {
 			confirmChoice = readKeyIn();
@@ -207,9 +207,9 @@ public class ConvertDimen {
 				System.out.print("Please enter Y or N: ");
 			}
 		} while (!confirmChoice.equalsIgnoreCase("Y") && !confirmChoice.equalsIgnoreCase("N"));
-		int totalTimes = 4;
 		int skipType = inputType-1;
 		int nowSavingType = 0;
+		int arrayIndex = 0;
 		String fileType = null;
 		do {
 			fileType = types[nowSavingType];
@@ -217,45 +217,45 @@ public class ConvertDimen {
 				nowSavingType++;
 				continue;
 			}
-			for (int times = 0; times < totalTimes; times++) {
-				String mFilePath = savingPath+"/values-"+fileType+"/"; 
-				File dir = new File(mFilePath);
-				if (!dir.exists()) {
-					dir.mkdirs();
-				}
-				Writer fw = null;
-				BufferedWriter bw = null;
-				String theFront, theDimen = null, theLast;
-				try {
-					fw = new FileWriter(mFilePath + "dimens.xml", false);
-					bw = new BufferedWriter(fw);
-					theFront = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n";
-					bw.write(theFront);
+			String mFilePath = savingPath+"/values-"+fileType+"/"; 
+			File dir = new File(mFilePath);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			Writer fw = null;
+			BufferedWriter bw = null;
+			String theDimen = null;
+			try {
+				fw = new FileWriter(mFilePath + "dimens.xml", false);
+				bw = new BufferedWriter(fw);
+				bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+				bw.newLine();
+				bw.write("<resources>");
+				bw.newLine();
+				bw.newLine();
+				for (int i = 0; i < mDimenName.length; i++) {
+					theDimen = "    <dimen name=\"" + mDimenName[i] + "\">" + newDimenValue[arrayIndex][i] + "</dimen>";
+					bw.write(theDimen);
 					bw.newLine();
-					for (int i = 0; i < mDimenName.length; i++) {
-						theDimen = "<dimen name=\"" + mDimenName[i] + "\">" + newDimenValue[times][i] + "</dimen>";
-						bw.write(theDimen);
-						bw.newLine();
-					}
-					theLast = "</resources>";
-					bw.write(theLast);
-					bw.newLine();
-					bw.close();
-				} catch (IOException e) {
-					System.err.println("Error writing the file : ");
-					e.printStackTrace();
-				} finally {
-					if (bw != null && fw != null) {
-						try {
-							bw.close();
-							fw.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+				}
+				bw.newLine();
+				bw.write("</resources>");
+				bw.close();
+			} catch (IOException e) {
+				System.err.println("Error writing the file : ");
+				e.printStackTrace();
+			} finally {
+				if (bw != null && fw != null) {
+					try {
+						bw.close();
+						fw.close();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
-			} 
+			}
 			nowSavingType++;
+			arrayIndex++;
 		} while (nowSavingType < types.length);
 	}
 }
